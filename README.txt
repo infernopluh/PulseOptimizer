@@ -1,6 +1,6 @@
 # Pulse — PC Optimizer (WPF, .NET 8)
 
-A clean, ready-to-build Windows 10/11 PC optimization tool built with WPF.
+A clean, safe Windows 10/11 PC optimization tool built with WPF.
 
 ## Features
 - One‑Click Optimize (Temp + Browser Cache + Windows Update cache + Recycle Bin + RAM trim)
@@ -11,11 +11,6 @@ A clean, ready-to-build Windows 10/11 PC optimization tool built with WPF.
 - Admin manifest included (app runs elevated by default for full access)
 - Release publish configured for single-file EXE (win-x64)
 
-## Build
-1. Open `PCOptimizer.sln` in Visual Studio 2022+.
-2. Restore (automatic).
-3. Press **F5** (Debug) or **Build > Build Solution**.
-4. For a single-file EXE: Right-click project > **Publish** > use the included profile settings (Release, win-x64).
 
 ## Notes / Safety
 - Uses safe cleanup paths. No registry cleaning or risky tweaks.
@@ -24,9 +19,5 @@ A clean, ready-to-build Windows 10/11 PC optimization tool built with WPF.
 - RAM trim uses `EmptyWorkingSet` on non-critical processes; results vary by system.
 - Logs are saved to `%LOCALAPPDATA%\PulseOptimizer\Logs`.
 
-## Customization
-- Edit styles in `App.xaml` for colors/rounded corners.
-- Update the "bloat" process list in `Performance.KillCommonBloat()` based on your preference.
-- Add your branding in `MainWindow.xaml`.
 
 Enjoy!
