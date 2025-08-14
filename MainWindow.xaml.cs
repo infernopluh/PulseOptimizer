@@ -94,6 +94,7 @@ namespace PCOptimizer
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
+
         private static extern bool GlobalMemoryStatusEx([In, Out] MEMORYSTATUSEX lpBuffer);
         private static bool IsRunningAsAdmin()
         {
@@ -304,9 +305,7 @@ namespace PCOptimizer
             var total = new DeleteResult(0, 0);
             total = Sum(total, DeleteFrom(Environment.GetEnvironmentVariable("TEMP") ?? ""));
             total = Sum(total, DeleteFrom(Path.GetTempPath()));
-            // Windows Prefetch (safe-ish)
             total = Sum(total, DeleteFrom(@"C:\Windows\Prefetch"));
-            // Windows logs
             total = Sum(total, DeleteFrom(@"C:\Windows\Logs"));
             Logger.Info($"ClearTemp: {total.FilesDeleted} files, {total.BytesDeleted} bytes.");
             return total;
@@ -314,7 +313,6 @@ namespace PCOptimizer
 
         public static DeleteResult ClearWindowsUpdateCache()
         {
-            // Stop services is risky; just delete download cache (safe)
             return DeleteFrom(@"C:\Windows\SoftwareDistribution\Download");
         }
 
@@ -324,11 +322,8 @@ namespace PCOptimizer
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-            // Chrome
             total = Sum(total, DeleteFrom(Path.Combine(localAppData, @"Google\Chrome\User Data\Default\Cache")));
-            // Edge
             total = Sum(total, DeleteFrom(Path.Combine(localAppData, @"Microsoft\Edge\User Data\Default\Cache")));
-            // Firefox (iterate profiles)
             var ffProfiles = Path.Combine(appData, @"Mozilla\Firefox\Profiles");
             if (Directory.Exists(ffProfiles))
             {
@@ -402,13 +397,10 @@ namespace PCOptimizer
         public static List<StartupItem> GetAll()
         {
             var list = new List<StartupItem>();
-            // HKCU Run
             list.AddRange(ReadRunKey(Registry.CurrentUser, RunKeyCU, "HKCU", enabled: true));
             list.AddRange(ReadRunKey(Registry.CurrentUser, DisabledKeyCU, "HKCU", enabled: false));
-            // HKLM Run (requires admin)
             list.AddRange(ReadRunKey(Registry.LocalMachine, RunKeyLM, "HKLM", enabled: true));
             list.AddRange(ReadRunKey(Registry.LocalMachine, DisabledKeyLM, "HKLM", enabled: false));
-            // Startup folder
             var startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
             var disabledFolder = Path.Combine(Path.GetDirectoryName(startupFolder) ?? "", "Startup_DisabledByPulse");
             list.AddRange(ReadStartupFolder(startupFolder, true));
@@ -541,7 +533,6 @@ namespace PCOptimizer
                 try
                 {
                     if (p.Id == 0) continue;
-                    // Skip critical/system
                     string name = p.ProcessName.ToLowerInvariant();
                     if (name is "system" or "idle" or "csrss" or "wininit" or "winlogon" or "services" or "lsass") continue;
                     var before = p.WorkingSet64;
@@ -558,7 +549,6 @@ namespace PCOptimizer
 
         public static (int killed, int failed) KillCommonBloat()
         {
-            // Safe-ish list; won't kill shell or system
             string[] targets = new[] { "OneDrive", "Teams", "YourPhone", "Cortana", "SkypeBackground", "AdobeCollabSync", "Discord", "SteamWebHelper" };
             int killed = 0, failed = 0;
             foreach (var p in Process.GetProcesses())
@@ -600,7 +590,6 @@ namespace PCOptimizer
 
         public static bool SetHighPerformance()
         {
-            // High Performance default GUID
             return RunPowerCfg("/S 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
         }
 
