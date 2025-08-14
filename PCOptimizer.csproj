@@ -24,7 +24,6 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="System.Management" Version="9.0.8" />
   </ItemGroup>
 
